@@ -29,20 +29,22 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 
 
+#variables and storage
+
 traversal_path = []
 walkback = Stack()
 visited = {}
-opposites = {'n':'s', 's':'n', 'e':'w', 'w':'e'}
+opposites = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
 
 # methods
 
-#identify exits
+# identify exits
 def id_exits(current_room):
     exits = current_room.get_exits()
 
     for exit in exits:
-        visited[current_room.id][exit] = current_room.get_room_in_direction(exit).id
-        print(f'assigned exit: {exit}')
+        visited[current_room.id][exit] = current_room.get_room_in_direction(
+            exit).id
     return
 
 # check the current room for unused exits
@@ -56,35 +58,21 @@ def check_exits(visited, current_room):
             unused_exits.append(exit)
 
     if len(unused_exits) > 0:
-        print(f'there were unused exits: {unused_exits} ')
         return unused_exits
 
-    print(f'there were no unused exits')
     return None
 
 # randomly select an exit
-
-
 def choose_exit(visited, current_room):
 
     valid_exits = check_exits(visited, current_room)
 
     if valid_exits:
-        print(f'there were valid exits')
         return random.choice(valid_exits)
 
         return None
 
-# use bfs to backtrack to a room with unexplored exits
-
-
-def backtrack(visited, current_room):
-
-   pass
-
-# use dft to go through the rooms at random until you hit a dead end, then call backtrack.
-
-
+# go through rooms at random until hit a dead end, then go back through each room in order until you find an unused exit. 
 def walk_the_maze(visited, current_room):
 
     rooms = Stack()
@@ -92,18 +80,16 @@ def walk_the_maze(visited, current_room):
 
     while len(visited) < len(world.rooms):
         current_room = rooms.pop()
-        print(f'current room: {current_room} ')
-        
+
         if current_room.id not in visited:
             visited[current_room.id] = {}
             if len(visited) == len(world.rooms):
                 break
-        
+
         id_exits(current_room)
-        
+
         move = choose_exit(visited, current_room)
-        print(f'random move is: {move} ')
-        
+
         if move != None:
             traversal_path.append(move)
             walkback.push(opposites[move])
@@ -111,13 +97,9 @@ def walk_the_maze(visited, current_room):
             rooms.push(player.current_room)
         else:
             backtrack = walkback.pop()
-            print(f'need to backtrack. going {backtrack} ')
             player.travel(backtrack)
             traversal_path.append(backtrack)
             rooms.push(player.current_room)
-
-        
-
 
 
 walk_the_maze(visited, player.current_room)
